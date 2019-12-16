@@ -25,9 +25,7 @@ class CalButton(ttk.Frame):
 
     
 
-class Days(ttk.Frame):
-    
-    
+class Days(ttk.Frame):    
 
     def __init__(self, parent, text, wlabel= 1 ,hlabel=1):
         ttk.Frame.__init__(self, parent, width=WIDTHBTN*wlabel, height=HEIGHTBTN*hlabel)
@@ -56,21 +54,22 @@ class Calendar(ttk.Frame):
         ttk.Frame.__init__(self, parent)
     
         # CREACIÓN DE LA PRIMERA LÍNEA DEL CALENDARIO. BOTONES + MES & AÑO
-        self.btn_inicio = CalButton(self, text = '«', command = None, hbtn=0.5)
+        self.btn_inicio = CalButton(self, text = '«', command = lambda: self.backFull('«'), hbtn=0.5)
         self.btn_inicio.grid(column = 0, row = 0)
         
         self.btn_volver = CalButton(self, text = '<', command = lambda: self.back('<'), hbtn=0.5)
         self.btn_volver.grid(column=1 ,row=0)
+
         self.lbl_mes = Days(self, text = str(self.listaMeses[dt.month-1]) + str(' ') + str(dt.year),wlabel= 3, hlabel= 0.5)
         self.lbl_mes.grid(column = 2 , row = 0, columnspan = 3)
 
-        self.btn_avanzar = CalButton(self, text = '>', command = lambda: self.avanzar('>'), hbtn=0.5)
-        self.btn_avanzar.grid(column = 5, row = 0)
+        self.btn_moveOn = CalButton(self, text = '>', command = lambda: self.moveOn('>'), hbtn=0.5)
+        self.btn_moveOn.grid(column = 5, row = 0)
 
-        self.btn_final = CalButton(self, text = '»', command = None, hbtn=0.5)
+        self.btn_final = CalButton(self, text = '»', command = lambda: self.moveOnFull('»'), hbtn=0.5)
         self.btn_final.grid(column=6, row=0)
 
-        # CREACIÓN DE LOS NOMBRES DE LOS DÍAS DE LAS SEMANA
+        # Creación de los nombres de cada día
         column = 0
         row = 1
         for i in self.diasSemana:            
@@ -79,22 +78,38 @@ class Calendar(ttk.Frame):
             self.lbl_i.grid(column = column, row = row)
                     
             column += 1
+
+        #Creación de los días del calendario
             
+    def backFull (self, simbolo):
+
+        if simbolo == '«':
+            
+            self.indiceMeses = -(dt.month) 
+            month = dt.month + self.indiceMeses
+            year = dt.year + self.indiceAños
+            print(month)
+            print(self.listaMeses[month])            
+            print(year)
+            self.lbl_mes.config( text = str(self.listaMeses[month]))
+            
+        return month
+
     def back(self, simbolo):
 
         if simbolo == '<':
-            month = dt.month + self.indiceMeses - 1
+            month = dt.month + self.indiceMeses 
 
             if month  == 0 :
                 self.indiceMeses = 12  - dt.month
                 self.indiceAños -= 1
                 month = dt.month + self.indiceMeses 
-                print(month)
-                print(self.listaMeses[month])
                 year = dt.year + self.indiceAños
+                print(month)
+                print(self.listaMeses[month-1])                
                 print(year)
-                self.indiceMeses += 1
-                self.muestraMes(self.listaMeses[month])
+                self.indiceMeses -= 1
+                self.lbl_mes.config(text = str(self.listaMeses[month-1]) )
 
                 
             else: 
@@ -105,38 +120,54 @@ class Calendar(ttk.Frame):
                 print(month)
                 print(self.listaMeses[month])
                 print(year)
-                self.muestraMes(self.listaMeses[month])
+                self.lbl_mes.config(text = str(self.listaMeses[month]))
+        
+        return month
 
+    def moveOnFull(self,simbolo):
+
+        if simbolo == '»':
+            
+            self.indiceMeses = 12  - dt.month
+            month = dt.month + self.indiceMeses
+            year = dt.year + self.indiceAños
+            print(month)
+            print(self.listaMeses[month-1])
+            print(year)
+            self.lbl_mes.config(text = str(self.listaMeses[month-1]))
+        
+        return month
     
-    def avanzar(self, simbolo):
+    def moveOn(self, simbolo):
         
         if simbolo == '>':           
             
             month = dt.month + self.indiceMeses - 1
 
-            if month  == len(self.listaMeses) - 1 :
+            if month  == len(self.listaMeses) - 1  :
                 self.indiceMeses = -(dt.month) 
                 self.indiceAños += 1
                 month = dt.month + self.indiceMeses
-                print(month)
-                print(self.listaMeses[month])
                 year = dt.year + self.indiceAños
-                self.indiceMeses += 1
+                print(month)
+                print(self.listaMeses[month])                
                 print(year)
-                self.muestraMes(self.listaMeses[month])
-
+                self.indiceMeses += 1
+                self.lbl_mes.config(text = str(self.listaMeses[month]))
+                
                 
             else: 
 
                 self.indiceMeses += 1
-                month = dt.month + self.indiceMeses - 1
+                month = dt.month + self.indiceMeses 
                 year = dt.year + self.indiceAños 
                 print(month)
                 print(self.listaMeses[month])
                 print(year)
-                self.muestraMes(self.listaMeses[month])
+                self.lbl_mes.config(text = str(self.listaMeses[month]))
                
-                
+        return month
+
     def muestraMes(self, cadena):
         self.cadena = cadena
         self.lbl_mes.config(text=self.cadena)
