@@ -1,8 +1,8 @@
 from tkinter import *
 from tkinter import ttk
 
-from calendar import *
-from calendar import WIDTHBTN, HEIGHTBTN
+from Calendar import *
+from Calendar import WIDTHBTN, HEIGHTBTN
 
 class MainApp(Tk):
     def __init__(self):
