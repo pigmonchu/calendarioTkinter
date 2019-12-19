@@ -50,7 +50,7 @@ class Calendar(ttk.Frame):
     indiceAños = 0
     listaMeses =['Enero',' Febrero', 'Marzo','Abril','Mayo','Junio','Julio', 'Agosto','Septiembre','Octubre', 'Noviembre','Diciembre']
     diasSemana = ['Lunes','Martes','Miercoles','Jueves', 'Viernes', 'Sabado', 'Domingo']
-    
+    __dates = []
     
 
     def __init__(self, parent):
@@ -89,45 +89,27 @@ class Calendar(ttk.Frame):
 
         month = dt.month
         year = dt.year
-        column = date(year, month , 1).weekday()
-        row = 2
-        diaInicial = calendar.monthrange(year,month)
-        self.mesAnterior = diaInicial[1]
-
-        for i in range(1, diaInicial[1]):
-            
-            if column == 5 or column == 6:
-                self.lbl_i = Days(self, text = i, foreground='red')
-                self.lbl_i.grid(column = column, row = row)
-
-            else: 
-                self.lbl_i = Days(self, text = i,  foreground='black')
-                self.lbl_i.grid(column = column, row = row)
-
-
-            column += 1
-            if column == 7:
-                column = 0
-                row += 1
-        
-    #Creación de los días del calendario al ir cambiando de mes.
+        self.createDays(month, year) # RMR: Reutilizo el código duplicado.
 
     def createDays(self,month,year):
-        
+        '''
+        Crea instancias de Days para cada dia y las posiciona adecuadamente.
+        Guarda referencias para destruirlas en el cambio de mes
+        '''        
+        self.deleteDays()
         column = date(year, month , 1).weekday()
         row = 2
         dia = calendar.monthrange(year,month)
 
-        for i in range(1, dia[1]):
+
+        for i in range(1, dia[1]+1):
 
             if column == 5 or column == 6:
                 self.lbl_i = Days(self, text = i, foreground = 'red')
-                self.lbl_i.grid(column = column, row = row)
-            
             else:
-
                 self.lbl_i = Days(self, text = i, foreground='black')
-                self.lbl_i.grid(column = column, row = row)
+            self.lbl_i.grid(column = column, row = row)
+            self.__dates.append(self.lbl_i)
 
             column += 1
             if column == 7:
@@ -136,15 +118,15 @@ class Calendar(ttk.Frame):
 
     # Método para borrar los días y escribir los del nuevo mes.
          
-    def deleteDays(self, mesAnterior):
+    def deleteDays(self):
 
-        try:
-            for i in range (1, 31):
-                self.lbl_i.forget()
+        for day in self.__dates:
+            day.grid_forget()
+            day.update()
+            day.destroy()
         
-        except:
-            pass
-    
+        self.__dates = []
+
     # Método para ir al primer mes del año, es decir, a Enero.
 
     def backFull (self, simbolo):
